@@ -1,0 +1,50 @@
+import csv
+import math
+with open('pareto_front_optimal_values.csv') as csvfile:
+    readCSV = csv.reader(csvfile, delimiter=',')
+    count = 0
+    f1 = []
+    f2 = []
+    for row in readCSV:
+        f1.append(float(row[1]))
+        f2.append(float(row[2]))
+
+#Calculating list with d_i, min distance between points of Pareto front approximation
+d=[]
+d_aux = f1[-1]
+for i in range(len(f1)):
+    d_aux = f1[-1]
+    for j in range((len(f2))):
+        if i != j:
+            if math.sqrt((f1[i]-f1[j])**2+(f2[i]-f2[j])**2) < d_aux:
+                d_aux = math.sqrt((f1[i]-f1[j])**2+(f2[i]-f2[j])**2)
+    d.append(d_aux)
+
+#Calculating Spacing
+aux = 0
+d_av=sum(d)/len(d)
+for i in range(len(d)):
+    aux += (d_av-d[i])**2
+SP = math.sqrt(aux/(len(d)-1))
+print("Spacing quality indicator = "+str(SP))
+
+#Calculating delta
+aux = 0
+for i in d:
+    aux += abs(i-d_av)
+delta = aux/(len(d)-1)
+print("Delta quality indicator = "+str(delta))
+
+#Calculating Gamma
+Gamma = 0
+for i in range(len(f1)-1):
+    if abs(f1[i+1]-f1[i])>Gamma:
+        Gamma = abs(f1[i+1]-f1[i])
+for j in range(len(f2)-1):
+    if abs(f2[i + 1] - f2[i]) > Gamma:
+        Gamma = abs(f2[i + 1] - f2[i])
+print("Gamma quality indicator = "+str(Gamma))
+
+#Calculating Hole relative size (HRS)
+HRS = max(d)/d_av
+print("Hole relative size quality indicator = " + str(HRS))
